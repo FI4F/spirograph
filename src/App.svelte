@@ -16,6 +16,8 @@
     onAppend()
     onAppend()
   let animated = false
+  let show_croshair = true
+  let show_segments = false
 
   // canvas
   let logical_canvas
@@ -76,7 +78,11 @@
 
     // draw spirograph
     virtual_canvas_context.strokeStyle = "#fff"
-      virtual_canvas_context.beginPath()
+    virtual_canvas_context.lineCap   = "round"
+    virtual_canvas_context.lineJoin  = "round"
+    virtual_canvas_context.lineWidth = 2
+
+    virtual_canvas_context.beginPath()
       virtual_canvas_context.moveTo( cursor.x,  cursor.y)
       virtual_canvas_context.lineTo(_cursor.x, _cursor.y)
       virtual_canvas_context.closePath()
@@ -108,19 +114,49 @@
     // draw spirograph
     logical_canvas_context.drawImage(virtual_canvas, 0, 0)
 
-    // draw cursor
+
     logical_canvas_context.translate(
       virtual_canvas_w / 2,
       virtual_canvas_h / 2
     )
-    logical_canvas_context.strokeStyle="#fff"
+    logical_canvas_context.strokeStyle = "#fff"
+    logical_canvas_context.lineCap   = "round"
+    logical_canvas_context.lineJoin  = "round"
+    logical_canvas_context.lineWidth = 2
+
+    // draw radius
+    if(show_segments) {
       logical_canvas_context.beginPath()
-      logical_canvas_context.moveTo(cursor.x - 8, cursor.y)
-      logical_canvas_context.lineTo(cursor.x + 8, cursor.y)
-      logical_canvas_context.moveTo(cursor.x, cursor.y - 8)
-      logical_canvas_context.lineTo(cursor.x, cursor.y + 8)
+
+      let cursor = { x: 0, y: 0 }
+      for(let oscillator of oscillators) {
+        const
+          theta = (oscillator.phase + oscillator.value),
+          degrees = oscillator.units === "Degrees" ? theta : theta * RADIANS_TO_DEGREES,
+          radians = oscillator.units === "Radians" ? theta : theta * DEGREES_TO_RADIANS;
+        
+        const _cursor = { ...cursor }
+        _cursor.x += oscillator.radius * Math.cos(radians)
+        _cursor.y += oscillator.radius * Math.sin(radians)
+        logical_canvas_context.moveTo( cursor.x,  cursor.y)
+        logical_canvas_context.lineTo(_cursor.x, _cursor.y)
+        cursor = _cursor
+      }
+
       logical_canvas_context.closePath()
-    logical_canvas_context.stroke()
+      logical_canvas_context.stroke()
+    }
+
+    // draw cursor
+    if(show_croshair) {
+      logical_canvas_context.beginPath()
+        logical_canvas_context.moveTo(cursor.x - 8, cursor.y)
+        logical_canvas_context.lineTo(cursor.x + 8, cursor.y)
+        logical_canvas_context.moveTo(cursor.x, cursor.y - 8)
+        logical_canvas_context.lineTo(cursor.x, cursor.y + 8)
+      logical_canvas_context.closePath()
+      logical_canvas_context.stroke()
+    } 
   }
 
   function onResize() {
@@ -255,16 +291,12 @@
     <label for="my-drawer" class="btn drawer-button text-3xl float-right order-last">
       <span><i class="ph-list"></i></span>
     </label>
-    <canvas bind:this={ logical_canvas } class="absolute w-screen h-screen pointer-events-none"/>
-    
+    <canvas bind:this={ logical_canvas } class="absolute w-screen h-screen pointer-events-none"/>    
   </div>
   <div class="drawer-side">
     <label for="my-drawer" class="drawer-overlay"></label>
     <div class="flex flex-col bg-base-200 h-full p-4 gap-2 rounded-xl">
       <div class="flex flex-row gap-2">
-        <button class="flex-1 btn btn-ghost text-3xl" on:click={ onStep } disabled={ animated }>
-          <span><i class="ph-skip-forward"></i></span>
-        </button>
         { #if animated }
           <button class="flex-1 btn btn-ghost text-3xl" on:click={ onPause } disabled={ !animated }>
             <span><i class="ph-pause"></i></span>
@@ -274,18 +306,29 @@
             <span><i class="ph-play"></i></span>
           </button>
         {/if}
-      </div>
-      <div class="flex flex-row gap-2">
+        <button class="flex-1 btn btn-ghost text-3xl" on:click={ onStep } disabled={ animated }>
+          <span><i class="ph-skip-forward"></i></span>
+        </button>
         <button class="flex-1 btn btn-ghost text-3xl" on:click={ onReset } disabled={ animated }>
           <span><i class="ph-arrows-clockwise"></i></span>
+        </button>
+      </div>
+      <div class="flex flex-row gap-2">
+        <button class="flex-1 btn btn-ghost text-3xl" on:click={ () => { show_croshair=!show_croshair; onRender() }}>
+          <span><i class="ph-crosshair-simple"></i></span>
+        </button>
+        <button class="flex-1 btn btn-ghost text-3xl" on:click={ () => { show_segments=!show_segments; onRender() }}>
+          <span><i class="ph-line-segments"></i></span>
         </button>
         <button class="flex-1 btn btn-ghost text-3xl" on:click={ onClear } disabled={ animated }>
           <span><i class="ph-eraser"></i></span>
         </button>
       </div>
-      <button class="btn btn-ghost text-3xl" disabled={ animated || downloading} on:click={ onDownload }>
-        <span><i class="ph-floppy-disk"></i></span>
-      </button>
+      <div class="flex flex-row gap-2">
+        <button class="flex-1 btn btn-ghost text-3xl" disabled={ animated || downloading} on:click={ onDownload }>
+          <span><i class="ph-floppy-disk"></i></span>
+        </button>
+      </div>
       <div class="flex flex-row gap-2">
         <span class="flex-1 text-center">Radius</span>
         <span class="flex-1 text-center">Phase </span>
