@@ -1,7 +1,9 @@
 <script lang="ts">
   import { DEGREES_TO_RADIANS, RADIANS_TO_DEGREES, type Oscillator } from "./script/Oscillator"
   import OscillatorControls from "./svelte/Oscillator.svelte";
+  import { v4 as uuid } from "uuid";
   import { onMount } from "svelte";
+
 
   export const DEFAULT_RADIUS = 125
   export const DEFAULT_PHASE  = 90
@@ -236,7 +238,7 @@
 
       const a = document.createElement("a")
       a.href     = href
-      a.download = href
+      a.download = uuid()
       a.click ()
       a.remove()
 
