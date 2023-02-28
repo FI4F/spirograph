@@ -4,7 +4,6 @@
   import { v4 as uuid } from "uuid";
   import { onMount } from "svelte";
 
-
   export const DEFAULT_RADIUS = 256
   export const DEFAULT_PHASE  = -90
   export const DEFAULT_VALUE  = 0
@@ -19,6 +18,9 @@
   let show_croshair = true
   let show_segments = false
   let dt = 1
+
+  let stroke_width = 2
+  let stroke_color = "#ffffff"
 
   // canvas
   let logical_canvas
@@ -68,10 +70,10 @@
     )
 
     // draw spirograph
-    virtual_canvas_context.strokeStyle = "#fff"
-    virtual_canvas_context.lineCap   = "round"
-    virtual_canvas_context.lineJoin  = "round"
-    virtual_canvas_context.lineWidth = 2
+    virtual_canvas_context.strokeStyle = stroke_color
+    virtual_canvas_context.lineWidth   = stroke_width
+    virtual_canvas_context.lineJoin    = "round"
+    virtual_canvas_context.lineCap     = "round"
     virtual_canvas_context.beginPath()
 
     const n = Math.ceil(1 / dt)
@@ -92,7 +94,7 @@
       virtual_canvas_context.lineTo(_cursor.x, _cursor.y)
       cursor = _cursor
     }
-    
+
     virtual_canvas_context.closePath()
     virtual_canvas_context.stroke()
     // svelte jank magic
@@ -121,15 +123,15 @@
     // draw spirograph
     logical_canvas_context.drawImage(virtual_canvas, 0, 0)
 
-
     logical_canvas_context.translate(
       virtual_canvas_w / 2,
       virtual_canvas_h / 2
     )
     logical_canvas_context.strokeStyle = "#fff"
+    logical_canvas_context.lineWidth = 2.5
     logical_canvas_context.lineCap   = "round"
     logical_canvas_context.lineJoin  = "round"
-    logical_canvas_context.lineWidth = 2
+
 
     // draw radius
     if(show_segments) {
@@ -294,6 +296,24 @@
     downloading = false
   }
 
+  type RGB = [r: number, g: number, b: number]
+  type Hex = string
+
+  function hex2RGB(hex: Hex): RGB {
+    return [
+      parseInt(hex.slice(1, 3), 16),
+      parseInt(hex.slice(3, 5), 16),
+      parseInt(hex.slice(5, 7), 16)
+    ]
+  }
+
+  function rgb2Hex([r, g, b]: RGB): Hex {
+    return "#"
+    + (r.toString(16).length > 1 ? r.toString(16) : "0" + r.toString(16))
+    + (g.toString(16).length > 1 ? g.toString(16) : "0" + g.toString(16))
+    + (b.toString(16).length > 1 ? b.toString(16) : "0" + b.toString(16));
+  }
+
 </script>
 
 <div class="drawer drawer-end">
@@ -307,34 +327,36 @@
   <div class="drawer-side">
     <label for="my-drawer" class="drawer-overlay"></label>
     <div class="flex flex-col bg-base-200 h-full p-4 gap-2 rounded-xl items-center">
-      <div class="flex flex-row gap-2 w-full">
+      <div class="grid grid-cols-6 gap-2 w-full items-center">
         { #if animated }
-          <button class="flex-1 btn btn-ghost text-3xl" on:click={ onPause } disabled={ !animated }>
+          <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onPause } disabled={ !animated }>
             <span><i class="ph-pause"></i></span>
           </button>
         {:else}
-          <button class="flex-1 btn btn-ghost text-3xl" on:click={ onPlay  } disabled={  animated }>
+          <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onPlay  } disabled={  animated }>
             <span><i class="ph-play"></i></span>
           </button>
         {/if}
-        <button class="flex-1 btn btn-ghost text-3xl" on:click={ onStep } disabled={ animated }>
+        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onStep } disabled={ animated }>
           <span><i class="ph-skip-forward"></i></span>
         </button>
-        <button class="flex-1 btn btn-ghost text-3xl" on:click={ onReset } disabled={ animated }>
+        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onReset } disabled={ animated }>
           <span><i class="ph-arrows-clockwise"></i></span>
-        </button>
+        </button>        
+        <input type="range" min=".01" max="1" step=".01" bind:value={ dt } title={`${dt}`} class="col-span-3 range range-xs" />
       </div>
-      <input type="range" min=".01" max="1" step=".01" bind:value={ dt } title={`${dt}`} class="range range-xs" />
-      <div class="flex flex-row gap-2 w-full">
-        <button class="flex-1 btn btn-ghost text-3xl" on:click={ () => { show_croshair=!show_croshair; onRender() }}>
+      <div class="grid grid-cols-6 gap-2 w-full items-center">
+        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ () => { show_croshair=!show_croshair; onRender() }}>
           <span><i class="ph-crosshair-simple"></i></span>
         </button>
-        <button class="flex-1 btn btn-ghost text-3xl" on:click={ () => { show_segments=!show_segments; onRender() }}>
+        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ () => { show_segments=!show_segments; onRender() }}>
           <span><i class="ph-line-segments"></i></span>
         </button>
-        <button class="flex-1 btn btn-ghost text-3xl" on:click={ onClear } disabled={ animated }>
+        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onClear } disabled={ animated }>
           <span><i class="ph-eraser"></i></span>
         </button>
+        <input type="range" title={`${stroke_width}`} min=.5 max=10 step=.5 class="col-span-2 range range-xs"  bind:value={ stroke_width }/>        
+        <input type="color" title={`${stroke_color}`}                       class="col-span-1 input w-full"    bind:value={ stroke_color }/>
       </div>
       <button class="btn btn-ghost text-3xl w-full" disabled={ animated || downloading} on:click={ onDownload }>
         <span><i class="ph-floppy-disk"></i></span>
