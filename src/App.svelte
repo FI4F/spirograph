@@ -5,7 +5,7 @@
   import { onMount } from "svelte";
 
 
-  export const DEFAULT_RADIUS = 125
+  export const DEFAULT_RADIUS = 256
   export const DEFAULT_PHASE  = 90
   export const DEFAULT_VALUE  = 0
   export const DEFAULT_UNITS = "Degrees"
@@ -26,8 +26,8 @@
   let virtual_canvas_context: CanvasRenderingContext2D
   let logical_canvas_w
   let logical_canvas_h
-  const virtual_canvas_w = 1024
-  const virtual_canvas_h = 1024
+  const virtual_canvas_w = 2048
+  const virtual_canvas_h = 2048
   let virtual_canvas_scale
 
   // cursor
