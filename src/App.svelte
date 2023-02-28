@@ -222,6 +222,29 @@
     }
   }
 
+  let downloading = false
+
+  // download
+  async function onDownload() {
+    if(!virtual_canvas) return
+
+    downloading = true
+
+      const 
+        blob = await virtual_canvas.convertToBlob({ type: "image/png" }),
+        href = URL.createObjectURL(blob)
+
+      const a = document.createElement("a")
+      a.href     = href
+      a.download = href
+      a.click ()
+      a.remove()
+
+      URL.revokeObjectURL(href)
+
+    downloading = false
+  }
+
 </script>
 
 <div class="drawer drawer-end">
@@ -258,6 +281,9 @@
           <span><i class="ph-eraser"></i></span>
         </button>
       </div>
+      <button class="btn btn-ghost text-3xl" disabled={ animated || downloading} on:click={ onDownload }>
+        <span><i class="ph-floppy-disk"></i></span>
+      </button>
       <div class="flex flex-row gap-2">
         <span class="flex-1 text-center">Radius</span>
         <span class="flex-1 text-center">Phase </span>
