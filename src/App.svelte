@@ -150,6 +150,10 @@
     // draw cursor
     if(show_croshair) {
       logical_canvas_context.beginPath()
+        logical_canvas_context.moveTo(- 8, 0)
+        logical_canvas_context.lineTo(+ 8, 0)
+        logical_canvas_context.moveTo(0, - 8)
+        logical_canvas_context.lineTo(0, + 8)
         logical_canvas_context.moveTo(cursor.x - 8, cursor.y)
         logical_canvas_context.lineTo(cursor.x + 8, cursor.y)
         logical_canvas_context.moveTo(cursor.x, cursor.y - 8)
