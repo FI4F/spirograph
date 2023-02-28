@@ -318,7 +318,7 @@
           <span><i class="ph-arrows-clockwise"></i></span>
         </button>
       </div>
-      <input type="range"  min=".01" max="1" step=".01" bind:value={ dt } title={`${dt}`} class="range range-xs" />
+      <input type="range" min=".01" max="1" step=".01" bind:value={ dt } title={`${dt}`} class="range range-xs" />
       <div class="flex flex-row gap-2 w-full">
         <button class="flex-1 btn btn-ghost text-3xl" on:click={ () => { show_croshair=!show_croshair; onRender() }}>
           <span><i class="ph-crosshair-simple"></i></span>
