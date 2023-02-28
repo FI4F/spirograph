@@ -18,6 +18,7 @@
   let animated = false
   let show_croshair = true
   let show_segments = false
+  let dt = 1
 
   // canvas
   let logical_canvas
@@ -68,7 +69,7 @@
 
     // update oscillators
     for(let oscillator of oscillators) {
-      oscillator.value += oscillator.delta
+      oscillator.value += oscillator.delta * dt
     }
     // svelte jank magic
     oscillators=[...oscillators]
@@ -299,8 +300,8 @@
   </div>
   <div class="drawer-side">
     <label for="my-drawer" class="drawer-overlay"></label>
-    <div class="flex flex-col bg-base-200 h-full p-4 gap-2 rounded-xl">
-      <div class="flex flex-row gap-2">
+    <div class="flex flex-col bg-base-200 h-full p-4 gap-2 rounded-xl items-center">
+      <div class="flex flex-row gap-2 w-full">
         { #if animated }
           <button class="flex-1 btn btn-ghost text-3xl" on:click={ onPause } disabled={ !animated }>
             <span><i class="ph-pause"></i></span>
@@ -317,7 +318,8 @@
           <span><i class="ph-arrows-clockwise"></i></span>
         </button>
       </div>
-      <div class="flex flex-row gap-2">
+      <input type="range"  min=".01" max="1" step=".01" bind:value={ dt } title={`${dt}`} class="range range-xs" />
+      <div class="flex flex-row gap-2 w-full">
         <button class="flex-1 btn btn-ghost text-3xl" on:click={ () => { show_croshair=!show_croshair; onRender() }}>
           <span><i class="ph-crosshair-simple"></i></span>
         </button>
@@ -328,12 +330,10 @@
           <span><i class="ph-eraser"></i></span>
         </button>
       </div>
-      <div class="flex flex-row gap-2">
-        <button class="flex-1 btn btn-ghost text-3xl" disabled={ animated || downloading} on:click={ onDownload }>
-          <span><i class="ph-floppy-disk"></i></span>
-        </button>
-      </div>
-      <div class="flex flex-row gap-2">
+      <button class="btn btn-ghost text-3xl w-full" disabled={ animated || downloading} on:click={ onDownload }>
+        <span><i class="ph-floppy-disk"></i></span>
+      </button>
+      <div class="flex flex-row gap-2 w-full">
         <span class="flex-1 text-center">Radius</span>
         <span class="flex-1 text-center">Phase </span>
         <span class="flex-1 text-center">Value </span>
@@ -345,7 +345,7 @@
           <OscillatorControls { oscillator } disabled={ animated }/>
         { /each }
       </div>
-      <div class="flex flex-row gap-2">
+      <div class="flex flex-row gap-2 w-full">
         <button class="flex-1 btn btn-ghost text-3xl" disabled={ animated } on:click={ onAppend }>
           <span><i class="ph-plus"></i></span>
         </button>
