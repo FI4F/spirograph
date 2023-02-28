@@ -6,7 +6,7 @@
 
 
   export const DEFAULT_RADIUS = 256
-  export const DEFAULT_PHASE  = 90
+  export const DEFAULT_PHASE  = -90
   export const DEFAULT_VALUE  = 0
   export const DEFAULT_UNITS = "Degrees"
 
