@@ -67,30 +67,36 @@
       virtual_canvas_h / 2
     )
 
-    // update oscillators
-    for(let oscillator of oscillators) {
-      oscillator.value += oscillator.delta * dt
-    }
-    // svelte jank magic
-    oscillators=[...oscillators]
-
-    // update cursor
-    const _cursor = where()
-
     // draw spirograph
     virtual_canvas_context.strokeStyle = "#fff"
     virtual_canvas_context.lineCap   = "round"
     virtual_canvas_context.lineJoin  = "round"
     virtual_canvas_context.lineWidth = 2
-
     virtual_canvas_context.beginPath()
+
+    const n = Math.ceil(1 / dt)
+    for(let i = 0; i < n; i ++) {
+      const _cursor = {x: 0, y: 0}
+      for(let oscillator of oscillators) {
+        oscillator.value += oscillator.delta * dt
+
+        const 
+          theta = (oscillator.phase + oscillator.value),
+          degrees = oscillator.units === "Degrees" ? theta : theta * RADIANS_TO_DEGREES,
+          radians = oscillator.units === "Radians" ? theta : theta * DEGREES_TO_RADIANS
+
+        _cursor.x += oscillator.radius * Math.cos(radians)
+        _cursor.y += oscillator.radius * Math.sin(radians)
+      }
       virtual_canvas_context.moveTo( cursor.x,  cursor.y)
       virtual_canvas_context.lineTo(_cursor.x, _cursor.y)
-      virtual_canvas_context.closePath()
+      cursor = _cursor
+    }
+    
+    virtual_canvas_context.closePath()
     virtual_canvas_context.stroke()
-
-    // update cursor
-    cursor = _cursor
+    // svelte jank magic
+    oscillators=[...oscillators]
   }
 
   function onRender() {
