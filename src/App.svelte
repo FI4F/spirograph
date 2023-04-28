@@ -76,11 +76,11 @@
     virtual_canvas_context.lineCap     = "round"
     virtual_canvas_context.beginPath()
 
-    const n = Math.ceil(1 / (1 - dt))
+    const n = Math.ceil(1 / dt)
     for(let i = 0; i < n; i ++) {
       const _cursor = {x: 0, y: 0}
       for(let oscillator of oscillators) {
-        oscillator.value += oscillator.delta * (1 - dt)
+        oscillator.value += oscillator.delta * dt
 
         const 
           theta = (oscillator.phase + oscillator.value),
@@ -343,7 +343,7 @@
         <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onReset } disabled={ animated } title="Reset values">
           <span><i class="ph-arrows-clockwise"></i></span>
         </button>        
-        <input type="range" min=".01" max="1" step=".01" bind:value={ dt } title={`Step resolution: ${dt}`} class="col-span-3 range range-xs"/>
+        <input type="range" min=".01" max="1" step=".01" bind:value={ dt } title={`Resolution: ${dt}`} class="col-span-3 range range-xs"/>
       </div>
       <div class="grid grid-cols-6 gap-2 w-full items-center">
         <button class="col-span-1 btn btn-ghost text-3xl" on:click={ () => { show_croshair=!show_croshair; onRender() }} title={`${show_croshair ? "Hide" : "Show"} crosshair`}>
