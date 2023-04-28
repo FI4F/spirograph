@@ -76,11 +76,11 @@
     virtual_canvas_context.lineCap     = "round"
     virtual_canvas_context.beginPath()
 
-    const n = Math.ceil(1 / dt)
+    const n = Math.ceil(1 / (1 - dt))
     for(let i = 0; i < n; i ++) {
       const _cursor = {x: 0, y: 0}
       for(let oscillator of oscillators) {
-        oscillator.value += oscillator.delta * dt
+        oscillator.value += oscillator.delta * (1 - dt)
 
         const 
           theta = (oscillator.phase + oscillator.value),
@@ -329,44 +329,44 @@
     <div class="flex flex-col bg-base-200 h-full p-4 gap-2 rounded-xl items-center">
       <div class="grid grid-cols-6 gap-2 w-full items-center">
         { #if animated }
-          <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onPause } disabled={ !animated }>
+          <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onPause } disabled={ !animated } title="Pause">
             <span><i class="ph-pause"></i></span>
           </button>
         {:else}
-          <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onPlay  } disabled={  animated }>
+          <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onPlay  } disabled={  animated } title="Play">
             <span><i class="ph-play"></i></span>
           </button>
         {/if}
-        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onStep } disabled={ animated }>
+        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onStep } disabled={ animated } title="Step">
           <span><i class="ph-skip-forward"></i></span>
         </button>
-        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onReset } disabled={ animated }>
+        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onReset } disabled={ animated } title="Reset values">
           <span><i class="ph-arrows-clockwise"></i></span>
         </button>        
-        <input type="range" min=".01" max="1" step=".01" bind:value={ dt } title={`${dt}`} class="col-span-3 range range-xs" />
+        <input type="range" min=".01" max="1" step=".01" bind:value={ dt } title={`Step resolution: ${dt}`} class="col-span-3 range range-xs"/>
       </div>
       <div class="grid grid-cols-6 gap-2 w-full items-center">
-        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ () => { show_croshair=!show_croshair; onRender() }}>
+        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ () => { show_croshair=!show_croshair; onRender() }} title={`${show_croshair ? "Hide" : "Show"} crosshair`}>
           <span><i class="ph-crosshair-simple"></i></span>
         </button>
-        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ () => { show_segments=!show_segments; onRender() }}>
+        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ () => { show_segments=!show_segments; onRender() }} title={`${show_segments ? "Hide" : "Show"} segments`}>
           <span><i class="ph-line-segments"></i></span>
         </button>
-        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onClear } disabled={ animated }>
+        <button class="col-span-1 btn btn-ghost text-3xl" on:click={ onClear } disabled={ animated } title="Clear canvas">
           <span><i class="ph-eraser"></i></span>
         </button>
-        <input type="range" title={`${stroke_width}`} min=.5 max=10 step=.5 class="col-span-2 range range-xs"  bind:value={ stroke_width }/>        
-        <input type="color" title={`${stroke_color}`}                       class="col-span-1 input w-full"    bind:value={ stroke_color }/>
+        <input type="range" title={`Stroke width: ${stroke_width}`} min=.5 max=10 step=.5 class="col-span-2 range range-xs"  bind:value={ stroke_width }/>        
+        <input type="color" title={`Stroke color: ${stroke_color}`}                       class="col-span-1 input w-full"    bind:value={ stroke_color }/>
       </div>
-      <button class="btn btn-ghost text-3xl w-full" disabled={ animated || downloading} on:click={ onDownload }>
+      <button class="btn btn-ghost text-3xl w-full" disabled={ animated || downloading} on:click={ onDownload } title="Save image">
         <span><i class="ph-floppy-disk"></i></span>
       </button>
       <div class="flex flex-row gap-2 w-full">
-        <span class="flex-1 text-center">Radius</span>
-        <span class="flex-1 text-center">Phase </span>
-        <span class="flex-1 text-center">Value </span>
-        <span class="flex-1 text-center">Delta </span>
-        <span class="flex-1 text-center">Units </span>
+        <span class="flex-1 text-center" title="The length of each segment in pixels">Radius</span>
+        <span class="flex-1 text-center" title="The offset angle of each segment">Phase </span>
+        <span class="flex-1 text-center" title="The current angle of each segment">Value </span>
+        <span class="flex-1 text-center" title="The amount by which the current angle should change each step">Delta </span>
+        <span class="flex-1 text-center" title="The units used for the phase, value, and delta of each segment">Units </span>
       </div>
       <div >
         { #each oscillators as oscillator }
@@ -374,10 +374,10 @@
         { /each }
       </div>
       <div class="flex flex-row gap-2 w-full">
-        <button class="flex-1 btn btn-ghost text-3xl" disabled={ animated } on:click={ onAppend }>
+        <button class="flex-1 btn btn-ghost text-3xl" disabled={ animated } on:click={ onAppend } title="Add segment">
           <span><i class="ph-plus"></i></span>
         </button>
-        <button class="flex-1 btn btn-ghost text-3xl" disabled={ animated } on:click={ onRemove }>
+        <button class="flex-1 btn btn-ghost text-3xl" disabled={ animated } on:click={ onRemove } title="Remove segment">
           <span><i class="ph-minus"></i></span>
         </button>
       </div>
